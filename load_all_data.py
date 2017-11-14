@@ -78,7 +78,7 @@ def load_all_data():
 
         # save loaded objects to cache file
 
-        dictionary = shelve.open(shelf_file)
+        dictionary = shelve.open(shelf_file + ".db")
 
         dictionary['num_words'] = num_words
         dictionary['num_training'] = num_training
