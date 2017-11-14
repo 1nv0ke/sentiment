@@ -116,7 +116,7 @@ def parse_tweets():
     with open(DIR_TEXT + TEXT_FILE) as f_in, open(DIR_TEXT + DATA_FILE, 'w') as f_out:
         tweet_cnt = 0
         word_counter = Counter()
-        for line in f_in.read().decode('utf-8').splitlines()[1:461]:
+        for line in f_in.read().decode('utf-8').splitlines()[3:463]:
             line = line.strip().lower()
             if line.find(DELIMITER) != -1:
                 tweet_cnt += 1
