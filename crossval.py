@@ -59,6 +59,8 @@ def cross_validate(trainer, predictor, all_data, all_labels, folds, params):
         model = trainer(train_data, train_labels, params)
 
         predictions = predictor(val_data, model)
+        if isinstance(predictions, tuple):
+            predictions = predictions[0]
 
         models.append(model)
 

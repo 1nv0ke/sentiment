@@ -73,8 +73,8 @@ def load_all_data():
 
         # load labels and convert to zero-indexed
 
-        train_labels = np.loadtxt('data/train.label') - 1
-        test_labels = np.loadtxt('data/test.label') - 1
+        train_labels = np.loadtxt('data/train.label') + 1
+        test_labels = np.loadtxt('data/test.label') + 1
 
         # save loaded objects to cache file
 
