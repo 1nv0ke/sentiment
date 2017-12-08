@@ -57,7 +57,7 @@ dt_test_accuracy = np.mean(dt_test_predictions == test_labels)
 print("Decision tree testing accuracy: %f" % dt_test_accuracy)
 
 num_folds = 5
-structures = [[400], [200, 100], [200, 200], [200, 400], [400, 400]]
+structures = [[100], [100, 10], [10, 10], [10, 100], [100, 100]]
 lambda_vals = [0.01, 0.1, 1]
 
 params = {
