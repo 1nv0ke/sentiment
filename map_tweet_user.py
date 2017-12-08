@@ -9,7 +9,6 @@ import json
 
 # _________________________________________________________________________________________________
 
-DIR = ''
 TEXT_KEY_LENGTH = None
 
 DELIMITER = '-tweet number#:'
@@ -60,6 +59,8 @@ def parse_tweet_json(json_file, text_file, output_file):
 # _________________________________________________________________________________________________
 
 if __name__ == '__main__':
-    parse_tweet_json(DIR + 'tw_with_id.json', DIR + '5000_trump_tweets.txt', DIR + '5000_trump_tweets_url.csv')
+    parse_tweet_json('./data/raw/tw_with_id.json',
+                     './data/text/tweets.txt',
+                     './data/raw/tweets_url.csv')
 
 # _________________________________________________________________________________________________

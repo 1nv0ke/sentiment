@@ -56,12 +56,12 @@ dt_test_predictions = decision_tree_predict(test_data, dt_model)
 dt_test_accuracy = np.mean(dt_test_predictions == test_labels)
 print("Decision tree testing accuracy: %f" % dt_test_accuracy)
 
-num_folds = 4
-structures = [[1], [4], [2, 2], [2, 4], [4, 4]]
+num_folds = 5
+structures = [[400], [200, 100], [200, 200], [200, 400], [400, 400]]
 lambda_vals = [0.01, 0.1, 1]
 
 params = {
-    'max_iter': 400,
+    'max_iter': 100,
     'squash_function': logistic,
     'loss_function': nll
 }
@@ -94,7 +94,7 @@ mlp_test_accuracy = np.mean(mlp_test_predictions == test_labels)
 print("MLP testing accuracy: %f" % (mlp_test_accuracy))
 print("with structure %s and lambda = %f" % (repr(best_params['num_hidden_units']), best_params['lambda']))
 
-svm_params = {'kernel': 'rbf', 'C': 1.0, 'sigma': 0.01}
+svm_params = {'kernel': 'rbf', 'C': 1.0, 'sigma': 0.1}
 svm_test_scores = np.zeros((test_labels.shape[0], num_class))
 for k in range(num_class):
     rbf_svm_model = kernel_svm_train(train_data, train_labels[:, k], svm_params)

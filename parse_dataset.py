@@ -7,6 +7,7 @@ Description:
 
 import re
 import random
+import csv
 from collections import Counter
 
 # _________________________________________________________________________________________________
@@ -32,6 +33,11 @@ TEST_LABEL_FILE = 'test.label'
 DIR_LABEL = './data/label/'
 NAMES = ['chang', 'hao', 'yecheng', 'yue']
 CONSENSUS_FILE = 'consensus.label'
+
+# _________________________________________________________________________________________________
+
+CSV_FILE = './data/raw/labeled_tweets.csv'
+LABEL_FILE = './data/label/consensus.label'
 
 # _________________________________________________________________________________________________
 
@@ -98,7 +104,7 @@ def create_consensus_labels(parse_raw=False):
 Functions for parsing tweets text file
 """
 
-def parse_tweets():
+def parse_tweets(indices=[]):
     """
     Parse tweets text file
     """
@@ -114,30 +120,37 @@ def parse_tweets():
     print('Dictionary word count: %d' % (word_cnt))
 
     with open(DIR_TEXT + TEXT_FILE) as f_in, open(DIR_TEXT + DATA_FILE, 'w') as f_out:
+        tweet_ind = 0
         tweet_cnt = 0
         word_counter = Counter()
-        for line in f_in.read().decode('utf-8').splitlines()[3:463]:
+        for line in f_in.read().decode('utf-8').splitlines()[2:]:
             line = line.strip().lower()
             if line.find(DELIMITER) != -1:
-                tweet_cnt += 1
-                if word_counter:
+                if tweet_ind in indices:
+                    tweet_cnt += 1
                     for key in sorted(word_counter.keys()):
                         f_out.write('%d %d %d\n' % (tweet_cnt, key, word_counter[key]))
-                    word_counter = Counter()
+                tweet_ind += 1
+                word_counter = Counter()
             else:
                 for word in list(line) + re.compile('\w+').findall(line):
                     if word in dict_words:
                         word_counter[dict_words[word]] += 1
-        print('Successfully parsed %d tweets' % (tweet_cnt))
+        if word_counter and tweet_ind in indices:
+            tweet_cnt += 1
+            for key in sorted(word_counter.keys()):
+                f_out.write('%d %d %d\n' % (tweet_cnt, key, word_counter[key]))
+        tweet_ind += 1
+        print('Successfully parsed %d out of %d tweets' % (tweet_cnt, tweet_ind))
 
 # _________________________________________________________________________________________________
 
-def split_dataset(folds=5):
+def split_dataset(folds=5, consensus_file=CONSENSUS_FILE):
     """
     Splits the dataset into training set and test set
     """
     with open(DIR_TEXT + DATA_FILE) as f_all_data, \
-         open(DIR_LABEL + CONSENSUS_FILE) as f_label, \
+         open(DIR_LABEL + consensus_file) as f_label, \
          open(DIR_DATA + TRAINING_DATA_FILE, 'w') as f_train_data, \
          open(DIR_DATA + TRAINING_LABEL_FILE, 'w') as f_train_label, \
          open(DIR_DATA + TEST_DATA_FILE, 'w') as f_test_data, \
@@ -179,9 +192,22 @@ def split_dataset(folds=5):
 
 # _________________________________________________________________________________________________
 
+def get_labels_from_csv(csv_file=CSV_FILE, lable_file=LABEL_FILE):
+    indices = []
+    with open(csv_file, 'rb') as f_csv, open(lable_file, 'w') as f_out:
+        reader = csv.reader(f_csv)
+        next(reader, None)  # skip the headers
+        for row in reader:
+            if row[1] and row[1] in ['-1', '0', '1']:
+                indices.append(int(row[0]))
+                f_out.write(row[1] + '\n')
+    return indices
+
+# _________________________________________________________________________________________________
+
 if __name__ == '__main__':
-    create_consensus_labels()
-    parse_tweets()
+    indices = get_labels_from_csv()
+    parse_tweets(indices=indices)
     split_dataset(folds=5)
 
 # _________________________________________________________________________________________________

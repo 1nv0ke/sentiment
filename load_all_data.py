@@ -44,8 +44,12 @@ def load_all_data():
         train_data_ijv = np.loadtxt('data/train.data', dtype=int)
         test_data_ijv = np.loadtxt('data/test.data', dtype=int)
 
-        num_training = train_data_ijv[:, 0].max()
-        num_testing = test_data_ijv[:, 0].max()
+        # load labels and convert to zero-indexed
+        train_labels = np.loadtxt('data/train.label') + 1
+        test_labels = np.loadtxt('data/test.label') + 1
+
+        num_training = train_labels.shape[0]
+        num_testing = test_labels.shape[0]
 
         # convert to zero-indexing
         train_data_ijv[:, :2] -= 1
@@ -70,11 +74,6 @@ def load_all_data():
 
         train_data = csc_matrix(train_data)
         test_data = csc_matrix(test_data)
-
-        # load labels and convert to zero-indexed
-
-        train_labels = np.loadtxt('data/train.label') + 1
-        test_labels = np.loadtxt('data/test.label') + 1
 
         # save loaded objects to cache file
 
