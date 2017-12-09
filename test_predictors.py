@@ -18,7 +18,7 @@ def multi_class_to_binary(labels):
 
 num_words, num_training, num_testing, train_data, test_data, train_labels, test_labels = load_all_data()
 
-d = 5000 # maximum number of features
+d = None # maximum number of features
 
 # Filter features by information gain
 gain = calculate_information_gain(train_data, train_labels)
@@ -29,7 +29,7 @@ train_data = train_data[ranks[:d], :]
 test_data = test_data[ranks[:d], :]
 
 # Try naive Bayes with hard-coded alpha value
-nb_params = {'alpha': 1.0}
+nb_params = {'alpha': 0.1}
 nb_model = naive_bayes_train(train_data, train_labels, nb_params)
 
 # Compute training accuracy
@@ -43,7 +43,7 @@ nb_test_accuracy = np.mean(nb_test_predictions == test_labels)
 print("Naive Bayes testing accuracy: %f" % nb_test_accuracy)
 
 # Try decision tree with hard-coded maximum depth
-dt_params = {'max_depth': 16}
+dt_params = {'max_depth': 64}
 dt_model = decision_tree_train(train_data, train_labels, dt_params)
 
 # Compute training accuracy
@@ -56,12 +56,12 @@ dt_test_predictions = decision_tree_predict(test_data, dt_model)
 dt_test_accuracy = np.mean(dt_test_predictions == test_labels)
 print("Decision tree testing accuracy: %f" % dt_test_accuracy)
 
-num_folds = 5
-structures = [[100], [100, 10], [10, 10], [10, 100], [100, 100]]
-lambda_vals = [0.01, 0.1, 1]
+num_folds = 4
+structures = [[10]]#[[100], [100, 10], [10, 10], [10, 100], [100, 100]]
+lambda_vals = [0.01]#, 0.1, 1]
 
 params = {
-    'max_iter': 100,
+    'max_iter': 400,
     'squash_function': logistic,
     'loss_function': nll
 }
@@ -94,7 +94,7 @@ mlp_test_accuracy = np.mean(mlp_test_predictions == test_labels)
 print("MLP testing accuracy: %f" % (mlp_test_accuracy))
 print("with structure %s and lambda = %f" % (repr(best_params['num_hidden_units']), best_params['lambda']))
 
-svm_params = {'kernel': 'rbf', 'C': 1.0, 'sigma': 0.1}
+svm_params = {'kernel': 'rbf', 'C': 1.0, 'sigma': 0.01}
 svm_test_scores = np.zeros((test_labels.shape[0], num_class))
 for k in range(num_class):
     rbf_svm_model = kernel_svm_train(train_data, train_labels[:, k], svm_params)

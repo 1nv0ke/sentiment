@@ -5,6 +5,7 @@ Description:
     This module contains various functions for creating the twitter sentiment analysis dataset.
 """
 
+import os
 import re
 import random
 import csv
@@ -27,6 +28,8 @@ TRAINING_DATA_FILE = 'train.data'
 TRAINING_LABEL_FILE = 'train.label'
 TEST_DATA_FILE = 'test.data'
 TEST_LABEL_FILE = 'test.label'
+
+SHELF_FILE = 'loaded_tweets.db'
 
 # _________________________________________________________________________________________________
 
@@ -104,13 +107,16 @@ def create_consensus_labels(parse_raw=False):
 Functions for parsing tweets text file
 """
 
-def parse_tweets(indices=[]):
+def parse_tweets(indices=[], include_emoji=True):
     """
     Parse tweets text file
     """
     dict_words = dict()
     word_cnt = 0
-    for file in [WORDS_DICTIONARY_FILE, EMOJIS_DICTIONARY_FILE]:
+    files = [WORDS_DICTIONARY_FILE]
+    if include_emoji:
+        files.append(EMOJIS_DICTIONARY_FILE)
+    for file in files:
         curr_cnt = word_cnt
         with open(DIR_DICT + file) as f:
             for word in f.read().decode('utf-8').splitlines():
@@ -145,7 +151,7 @@ def parse_tweets(indices=[]):
 
 # _________________________________________________________________________________________________
 
-def split_dataset(folds=5, consensus_file=CONSENSUS_FILE):
+def split_dataset(folds=4, consensus_file=CONSENSUS_FILE):
     """
     Splits the dataset into training set and test set
     """
@@ -190,6 +196,10 @@ def split_dataset(folds=5, consensus_file=CONSENSUS_FILE):
 
         print('Splitted dataset into %d for training and %d for testing' % (train_cnt, test_cnt))
 
+    try:
+        os.remove(SHELF_FILE)
+    except OSError:
+        pass
 # _________________________________________________________________________________________________
 
 def get_labels_from_csv(csv_file=CSV_FILE, lable_file=LABEL_FILE):
@@ -207,7 +217,7 @@ def get_labels_from_csv(csv_file=CSV_FILE, lable_file=LABEL_FILE):
 
 if __name__ == '__main__':
     indices = get_labels_from_csv()
-    parse_tweets(indices=indices)
-    split_dataset(folds=5)
+    parse_tweets(indices=indices, include_emoji=True)
+    split_dataset(folds=4)
 
 # _________________________________________________________________________________________________
