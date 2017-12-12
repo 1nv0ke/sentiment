@@ -120,8 +120,9 @@ def parse_tweets(indices=[], include_emoji=True):
         curr_cnt = word_cnt
         with open(DIR_DICT + file) as f:
             for word in f.read().decode('utf-8').splitlines():
-                word_cnt += 1
-                dict_words[word] = word_cnt
+                if not word in dict_words:
+                    word_cnt += 1
+                    dict_words[word] = word_cnt
         print('Added %d words from %s to dictionary' % (word_cnt - curr_cnt, file))
     print('Dictionary word count: %d' % (word_cnt))
 
@@ -151,7 +152,7 @@ def parse_tweets(indices=[], include_emoji=True):
 
 # _________________________________________________________________________________________________
 
-def split_dataset(folds=4, consensus_file=CONSENSUS_FILE):
+def split_dataset(testset, consensus_file=CONSENSUS_FILE):
     """
     Splits the dataset into training set and test set
     """
@@ -164,9 +165,8 @@ def split_dataset(folds=4, consensus_file=CONSENSUS_FILE):
 
         labels = f_label.readlines()
         label_cnt = len(labels)
-        test_cnt = label_cnt / folds
+        test_cnt = len(testset)
         train_cnt = label_cnt - test_cnt
-        testset = sorted(random.sample(range(1, label_cnt+1), test_cnt))
 
         # Create label files
         mapped_train = dict()
@@ -217,7 +217,10 @@ def get_labels_from_csv(csv_file=CSV_FILE, lable_file=LABEL_FILE):
 
 if __name__ == '__main__':
     indices = get_labels_from_csv()
-    parse_tweets(indices=indices, include_emoji=True)
-    split_dataset(folds=4)
+    label_cnt = len(indices)
+    folds = 4
+    testset = sorted(random.sample(range(1, label_cnt+1), label_cnt / folds))
+    parse_tweets(indices=indices, include_emoji=False)
+    split_dataset(testset=testset)
 
 # _________________________________________________________________________________________________
